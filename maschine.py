@@ -1,22 +1,19 @@
 import time
 from rtmidi import midiutil
 
-midiin = midiutil.open_midiinput('nano')
-midiout = midiutil.open_midioutput('nano')
-cableout = midiutil.open_midioutput('cable')
+midiin = midiutil.open_midiinput('maschine')
+midiout = midiutil.open_midioutput('maschine')
 print(midiin)
-print(cableout)
+print(midiout)
 
-GLOBAL_CHAN = 0
-KEY_CYCLE = 46
-KEY_PREV = 58
-KEY_NEXT = 59
-KEYS_GLOBAL = [60, 61, 62, 43, 44, 42, 41, 45] # transport buttons
-KEYS_ARM = [48, 49, 50, 51, 52, 53, 54, 55, # 0-7 channels mute buttons
-            64, 65, 66, 67, 68, 69, 70, 71, # 8-15 channels arm buttons
-            ]
-channel = 0
-isCycling = False
+CHANNEL = 0
+KEYS_GROUPS = [ 60, 61, 62, 43, 44, 42, 41, 45 ] # transport buttons
+KEYS_PADS = [
+    48, 49, 50, 51,
+    52, 53, 54, 55, # 0-7 channels mute buttons
+    64, 65, 66, 67, # 8-15 channels arm buttons
+    64, 65, 66, 67  # 8-15 channels arm buttons
+]
 
 def onmidi(event, data=None):
     global channel, isCycling
@@ -70,14 +67,12 @@ def send_channel_message(status, data1=None, data2=None, ch=channel, out=cableou
     out.send_message(msg)
 
 def shutdown():
-    global midiin, midiout, cableout
-    print('closing ports...')
+    global midiin, midiout
+    print('shutdown ...')
     midiin[0].close_port()
     midiout[0].close_port()
-    cableout[0].close_port()
     del midiin
     del midiout
-    del cableout
 
 try:
     while True:
